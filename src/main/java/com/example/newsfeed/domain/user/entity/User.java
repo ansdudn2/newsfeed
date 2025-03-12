@@ -27,5 +27,9 @@ public class User extends BaseEntity {
 
     @Column(nullable = false)
     private String username;
+
+    //자기소개는 100 자까지만가능
+    @Column(length =100)
+    private String bio;
 }
 
