@@ -32,7 +32,9 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
 
         HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
 
+        // request에서 userId를 가져올 때 Long 타입으로 받기
         Long userId = (Long) request.getAttribute("userId");
+
         if (userId == null) {
             throw new IllegalArgumentException("로그인이 필요합니다.");
         }
@@ -41,4 +43,6 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
     }
 }
+
+
 

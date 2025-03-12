@@ -11,6 +11,7 @@ import lombok.Getter;
 public class UserUpdateRequestDto {
 
     private String username;
+
     private String bio;
 
     @NotBlank(message = "현재 비밀번호를 입력해야 합니다.")

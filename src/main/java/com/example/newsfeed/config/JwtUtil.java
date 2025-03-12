@@ -23,13 +23,13 @@ public class JwtUtil {
     // Bean 초기화 시 자동으로 Base64로 secretKey 인코딩
     @PostConstruct
     protected void init() {
-        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
+        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());  // Base64로 인코딩
     }
 
     // 이메일을 기반으로 JWT 토큰 생성
     public String createToken(Long userId, String email) {
         Claims claims = Jwts.claims().setSubject(email);
-        claims.put("userId", userId); // 다른 엔티티에서 FK를 userId로 참조 중이므로 동일하게 사용
+        claims.put("userId", userId);  // 다른 엔티티에서 FK를 userId로 참조 중이므로 동일하게 사용
         Date now = new Date();
 
         return Jwts.builder()
@@ -43,7 +43,7 @@ public class JwtUtil {
     // 이메일 추출
     public String getEmail(String token) {
         return Jwts.parser()
-                .setSigningKey(secretKey)
+                .setSigningKey(Base64.getDecoder().decode(secretKey))  // Base64로 디코딩해서 사용
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
@@ -52,20 +52,31 @@ public class JwtUtil {
     // 유저 ID (userId) 추출
     public Long getUserId(String token) {
         return Jwts.parser()
-                .setSigningKey(secretKey)
+                .setSigningKey(Base64.getDecoder().decode(secretKey))  // Base64로 디코딩해서 사용
                 .parseClaimsJws(token)
                 .getBody()
                 .get("userId", Long.class);
     }
 
+    // 토큰 유효성 검사
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
-            return true;
+            Claims claims = Jwts.parser().setSigningKey(Base64.getDecoder().decode(secretKey))  // Base64로 디코딩하여 사용
+                    .parseClaimsJws(token).getBody();
+            Date expiration = claims.getExpiration();  // 만료 시간 확인
+
+            if (expiration.before(new Date())) {
+                log.error("JWT token is expired.");
+                return false;  // 만료된 토큰은 유효하지 않음
+            }
+
+            return true;  // 유효한 토큰
         } catch (JwtException | IllegalArgumentException e) {
             log.error("JWT validation failed: {}", e.getMessage());
-            return false;
+            return false;  // 유효하지 않은 토큰 처리
         }
     }
 }
+
+
 
