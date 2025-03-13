@@ -28,14 +28,14 @@ public class Feed extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user; // 작성자 (User와 연관 관계)
 
-    // 🔥 생성자 추가
+    // 생성자 추가
     public Feed(String title, String content, User user) {
         this.title = title;
         this.content = content;
         this.user = user;
     }
 
-    // 🔥 수정 메서드 추가
+    // 수정 메서드 추가
     public void update(String title, String content) {
         this.title = title;
         this.content = content;
