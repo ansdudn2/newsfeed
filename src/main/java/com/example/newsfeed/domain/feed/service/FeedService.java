@@ -2,6 +2,7 @@ package com.example.newsfeed.domain.feed.service;
 
 import com.example.newsfeed.domain.feed.dto.request.FeedRequestDto;
 import com.example.newsfeed.domain.feed.dto.request.FeedUpdateRequestDto;
+import com.example.newsfeed.domain.feed.dto.response.FeedLikeCountResponseDto;
 import com.example.newsfeed.domain.feed.dto.response.FeedResponseDto;
 import com.example.newsfeed.domain.feed.entity.Feed;
 import com.example.newsfeed.domain.feed.repository.FeedRepository;
@@ -13,6 +14,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
+
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class FeedService {
@@ -72,5 +76,20 @@ public class FeedService {
         }
 
         feedRepository.delete(feed); // 삭제
+    }
+
+    // 수정일자 기준 최신순 정렬
+    public Page<Feed> getAllFeeds(Pageable pageable) {
+        return feedRepository.findAll(pageable);
+    }
+
+    // 좋아요 많은 순 정렬
+    public Page<FeedLikeCountResponseDto> getFeedsSortedByLikes(Pageable pageable) {
+        return feedRepository.findAllFeedsOrderByLikeCount(pageable);
+    }
+
+    // 기간별 게시물 검색
+    public Page<Feed> searchFeedsByDateRange(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
+        return feedRepository.findByCreatedAtBetween(startDate, endDate, pageable);
     }
 }
