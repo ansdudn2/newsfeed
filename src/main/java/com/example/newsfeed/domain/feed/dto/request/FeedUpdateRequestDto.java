@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FeedUpdateRequestDto {
+
     @NotBlank(message = "제목을 입력해야 합니다.")
     private String title;
 
