@@ -13,6 +13,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 
 @Service
 @RequiredArgsConstructor
@@ -59,4 +63,22 @@ public class AuthService {
         return new LoginResponseDto(token);
     }
 
+    //로그아웃관련 블랙
+    private final Set<String> tokenBlacklist = Collections.synchronizedSet(new HashSet<>());
+
+    public void logout(Long userId, String refreshToken) {
+        tokenBlacklist.add(refreshToken);
+    }
+
+    @Transactional
+    public void withdraw(Long userId) {
+        // 사용자 존재 여부 확인
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // 필요 시, 연관 데이터 처리 (게시글, 댓글, 좋아요, 팔로우 등 삭제 또는 soft delete)
+
+        // 사용자 삭제
+        userRepository.delete(user);
+    }
 }

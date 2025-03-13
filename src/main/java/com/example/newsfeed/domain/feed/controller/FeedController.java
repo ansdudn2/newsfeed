@@ -3,6 +3,7 @@ package com.example.newsfeed.domain.feed.controller;
 import com.example.newsfeed.domain.common.annotation.Auth;
 import com.example.newsfeed.domain.feed.dto.request.FeedRequestDto;
 import com.example.newsfeed.domain.feed.dto.request.FeedUpdateRequestDto;
+import com.example.newsfeed.domain.feed.dto.response.FeedLikeCountResponseDto;
 import com.example.newsfeed.domain.feed.dto.response.FeedResponseDto;
 import com.example.newsfeed.domain.feed.entity.Feed;
 import com.example.newsfeed.domain.feed.service.FeedService;
@@ -11,10 +12,14 @@ import com.example.newsfeed.domain.user.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 
 
@@ -70,6 +75,32 @@ public class FeedController {
         // FeedResponseDto로 변환하여 반환
         Page<FeedResponseDto> response = feeds.map(feed -> new FeedResponseDto(feed));
         return ResponseEntity.ok(response);
+    }
+
+    // 수정일자 기준 최신순 정렬
+    @GetMapping("/updatedAt")
+    public Page<Feed> getFeedsSortedByUpdatedAt(Pageable pageable) {
+        // 수정일자 기준 내림차순 정렬
+        Pageable sortedByUpdatedAt = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+                Sort.by(Sort.Order.desc("updatedAt")));
+        return feedService.getAllFeeds(sortedByUpdatedAt);
+    }
+
+    // 좋아요 많은 순 정렬
+    @GetMapping("/likes")
+    public Page<FeedLikeCountResponseDto> getFeedsSortedByLikes(Pageable pageable) {
+        return feedService.getFeedsSortedByLikes(pageable);
+    }
+
+
+
+    // 기간별 게시물 검색
+    @GetMapping("/searchByDateRange")
+    public Page<Feed> searchFeedsByDateRange(
+            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+            Pageable pageable) {
+        return feedService.searchFeedsByDateRange(startDate, endDate, pageable);
     }
 }
 
