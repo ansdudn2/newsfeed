@@ -1,11 +1,13 @@
 package com.example.newsfeed.domain.feed.dto.response;
 
 import com.example.newsfeed.domain.feed.entity.Feed;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
+@AllArgsConstructor
 public class FeedResponseDto {
     private final Long id;
     private final String title;
